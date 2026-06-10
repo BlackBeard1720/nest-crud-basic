@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Param, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Put,
+  Patch,
+  Param,
+  Query,
+} from '@nestjs/common';
 
 @Controller('products')
 export class ProductsController {
@@ -46,7 +56,13 @@ export class ProductsController {
   // Tìm một sản phẩm theo id.
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.products.find((product) => product.id === Number(id));
+    const product = this.products.find((product) => product.id === Number(id));
+    if (!product) {
+      return {
+        message: 'Product not found',
+      };
+    }
+    return product;
   }
 
   // Tạo sản phẩm mới từ dữ liệu gửi lên.
@@ -61,5 +77,64 @@ export class ProductsController {
     this.products.push(newProduct);
 
     return newProduct;
+  }
+  // Cập nhật sản phẩm
+  @Put(':id')
+  update(
+    @Body() body: { name: string; price: number },
+    @Param('id') id: string,
+  ) {
+    const product = this.products.find((product) => product.id === Number(id));
+    if (!product) {
+      return {
+        message: 'Product not found',
+      };
+    }
+    product.name = body.name;
+    product.price = body.price;
+
+    return product;
+  }
+
+  @Patch(':id')
+  patch(
+    @Param('id') id: string,
+    @Body() body: { name?: string; price?: number },
+  ) {
+    const product = this.products.find((product) => product.id === Number(id));
+    if (!product) {
+      return {
+        message: 'Product not found',
+      };
+    }
+
+    if (body.name !== undefined) {
+      product.name = body.name;
+    }
+
+    if (body.price !== undefined) {
+      product.price = body.price;
+    }
+
+    return product;
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    const productIndex = this.products.findIndex(
+      (product) => product.id === Number(id),
+    );
+    if (productIndex === -1) {
+      return {
+        message: 'Product not found',
+      };
+    }
+
+    this.products.splice(productIndex, 1);
+
+    return {
+      message: 'Product deleted successfully',
+      deletedId: Number(id),
+    };
   }
 }
