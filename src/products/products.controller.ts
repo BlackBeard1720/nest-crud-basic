@@ -10,6 +10,9 @@ import {
   Query,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { PatchProductDto } from './dto/patch-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -25,23 +28,17 @@ export class ProductsController {
   }
 
   @Post()
-  create(@Body() body: { name: string; price: number }) {
+  create(@Body() body: CreateProductDto) {
     return this.productsService.create(body);
   }
 
   @Put(':id')
-  update(
-    @Param('id') id: string,
-    @Body() body: { name: string; price: number },
-  ) {
+  update(@Param('id') id: string, @Body() body: UpdateProductDto) {
     return this.productsService.update(id, body);
   }
 
   @Patch(':id')
-  patch(
-    @Param('id') id: string,
-    @Body() body: { name?: string; price?: number },
-  ) {
+  patch(@Param('id') id: string, @Body() body: PatchProductDto) {
     return this.productsService.patch(id, body);
   }
 
