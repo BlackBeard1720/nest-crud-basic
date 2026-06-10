@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 
 @Controller('products')
 export class ProductsController {
@@ -11,22 +11,34 @@ export class ProductsController {
     {
       id: 2,
       name: 'Mouse',
-      price: 500,
+      price: 20,
     },
     {
       id: 3,
       name: 'PC',
-      price: 2000,
+      price: 5000,
     },
     {
       id: 4,
       name: 'Phone',
       price: 400,
     },
+    {
+      id: 5,
+      name: 'Keyboard',
+      price: 50,
+    },
   ];
+  //route get all products with filter
   @Get()
-  findAll() {
-    return this.products;
+  findAll(@Query('keyword') keyword?: string) {
+    if (!keyword) {
+      return this.products;
+    }
+
+    return this.products.filter((product) =>
+      product.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()),
+    );
   }
   //route find product by id
   @Get(':id')
