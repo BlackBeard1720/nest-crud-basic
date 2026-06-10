@@ -55,11 +55,11 @@ export class ProductsService {
     return product;
   }
 
-  create(body: CreateProductDto) {
+  create(createProductDto: CreateProductDto) {
     const newProduct = {
       id: this.products.length + 1,
-      name: body.name,
-      price: body.price,
+      name: createProductDto.name,
+      price: createProductDto.price,
     };
 
     this.products.push(newProduct);
@@ -67,7 +67,7 @@ export class ProductsService {
     return newProduct;
   }
 
-  update(id: string, body: UpdateProductDto) {
+  update(id: string, updateProductDto: UpdateProductDto) {
     const product = this.products.find((product) => product.id === Number(id));
 
     if (!product) {
@@ -76,13 +76,13 @@ export class ProductsService {
       };
     }
 
-    product.name = body.name;
-    product.price = body.price;
+    product.name = updateProductDto.name;
+    product.price = updateProductDto.price;
 
     return product;
   }
 
-  patch(id: string, body: PatchProductDto) {
+  patch(id: string, patchProductDto: PatchProductDto) {
     const product = this.products.find((product) => product.id === Number(id));
 
     if (!product) {
@@ -91,12 +91,12 @@ export class ProductsService {
       };
     }
 
-    if (body.name !== undefined) {
-      product.name = body.name;
+    if (patchProductDto.name !== undefined) {
+      product.name = patchProductDto.name;
     }
 
-    if (body.price !== undefined) {
-      product.price = body.price;
+    if (patchProductDto.price !== undefined) {
+      product.price = patchProductDto.price;
     }
 
     return product;
