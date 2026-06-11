@@ -1,6 +1,12 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  NestModule,
+  Module,
+  RequestMethod,
+} from '@nestjs/common';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
+import { LoggerMiddleware } from './middlewares/logger/logger.middleware';
 
 // ProductsModule quản lý controller và service liên quan đến products.
 @Module({
@@ -9,4 +15,12 @@ import { ProductsService } from './products.service';
   // Service chứa logic xử lý dữ liệu products.
   providers: [ProductsService],
 })
-export class ProductsModule {}
+export class ProductsModule implements NestModule {
+  // Áp dụng middleware log cho request GET tới route products.
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes({
+      path: 'products',
+      method: RequestMethod.GET,
+    });
+  }
+}

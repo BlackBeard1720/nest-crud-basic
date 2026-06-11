@@ -11,7 +11,6 @@ export class ApiKeyGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     // ExecutionContext cho phép lấy thông tin request hiện tại.
     const request = context.switchToHttp().getRequest();
-    console.log(request.headers);
 
     // Đọc API key từ header x-api-key.
     const apiKey = request.headers['x-api-key'];
