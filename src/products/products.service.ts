@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PatchProductDto } from './dto/patch-product.dto';
@@ -50,9 +50,7 @@ export class ProductsService {
     const product = this.products.find((product) => product.id === id);
 
     if (!product) {
-      return {
-        message: 'Product not found',
-      };
+      throw new NotFoundException('Product not found');
     }
     return product;
   }
@@ -75,9 +73,7 @@ export class ProductsService {
     const product = this.products.find((product) => product.id === id);
 
     if (!product) {
-      return {
-        message: 'Product not found',
-      };
+      throw new NotFoundException('Product not found');
     }
 
     product.name = updateProductDto.name;
@@ -91,9 +87,7 @@ export class ProductsService {
     const product = this.products.find((product) => product.id === id);
 
     if (!product) {
-      return {
-        message: 'Product not found',
-      };
+      throw new NotFoundException('Product not found');
     }
 
     if (patchProductDto.name !== undefined) {
@@ -114,9 +108,7 @@ export class ProductsService {
     );
 
     if (productIndex === -1) {
-      return {
-        message: 'Product not found',
-      };
+      throw new NotFoundException('Product not found');
     }
 
     this.products.splice(productIndex, 1);

@@ -1,10 +1,13 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { HttpExceptionFilter } from './common/filters/http-exception/http-exception.filter';
 
 // main.ts là nơi bootstrap, tức là khởi tạo ứng dụng NestJS.
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   // ValidationPipe kiểm tra DTO trước khi request đi vào controller.
   app.useGlobalPipes(
