@@ -5,7 +5,7 @@ import { PatchProductDto } from './dto/patch-product.dto';
 
 @Injectable()
 export class ProductsService {
-  // Lưu data trong mảng
+  // Demo lưu data trong mảng; restart server thì dữ liệu tạo mới sẽ mất.
   private products = [
     {
       id: 1,
@@ -34,6 +34,7 @@ export class ProductsService {
     },
   ];
 
+  // Trả về tất cả products hoặc lọc theo keyword nếu có.
   findAll(keyword?: string) {
     if (!keyword) {
       return this.products;
@@ -44,8 +45,9 @@ export class ProductsService {
     );
   }
 
-  findOne(id: string) {
-    const product = this.products.find((product) => product.id === Number(id));
+  // Tìm một product theo id.
+  findOne(id: number) {
+    const product = this.products.find((product) => product.id === id);
 
     if (!product) {
       return {
@@ -55,6 +57,7 @@ export class ProductsService {
     return product;
   }
 
+  // Tạo product mới từ dữ liệu đã được validate trong DTO.
   create(createProductDto: CreateProductDto) {
     const newProduct = {
       id: this.products.length + 1,
@@ -67,8 +70,9 @@ export class ProductsService {
     return newProduct;
   }
 
-  update(id: string, updateProductDto: UpdateProductDto) {
-    const product = this.products.find((product) => product.id === Number(id));
+  // Cập nhật toàn bộ name và price của product.
+  update(id: number, updateProductDto: UpdateProductDto) {
+    const product = this.products.find((product) => product.id === id);
 
     if (!product) {
       return {
@@ -82,8 +86,9 @@ export class ProductsService {
     return product;
   }
 
-  patch(id: string, patchProductDto: PatchProductDto) {
-    const product = this.products.find((product) => product.id === Number(id));
+  // Cập nhật từng field nếu client có gửi lên.
+  patch(id: number, patchProductDto: PatchProductDto) {
+    const product = this.products.find((product) => product.id === id);
 
     if (!product) {
       return {
@@ -102,9 +107,10 @@ export class ProductsService {
     return product;
   }
 
-  remove(id: string) {
+  // Xóa product khỏi mảng theo id.
+  remove(id: number) {
     const productIndex = this.products.findIndex(
-      (product) => product.id === Number(id),
+      (product) => product.id === id,
     );
 
     if (productIndex === -1) {
@@ -117,7 +123,7 @@ export class ProductsService {
 
     return {
       message: 'Product deleted successfully',
-      deletedId: Number(id),
+      deletedId: id,
     };
   }
 }
