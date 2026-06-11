@@ -9,13 +9,18 @@ import {
   Param,
   Query,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PatchProductDto } from './dto/patch-product.dto';
+import { ApiKeyGuard } from './guards/api-key/api-key.guard';
+import { RolesGuard } from './guards/roles/roles.guard';
 
 // Controller chịu trách nhiệm nhận request HTTP và gọi service xử lý logic.
+// @UseGuards(ApiKeyGuard) áp dụng kiểm tra API key cho tất cả route trong controller này.
+@UseGuards(ApiKeyGuard)
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
@@ -57,6 +62,8 @@ export class ProductsController {
   }
 
   // DELETE xóa product theo id.
+  // RolesGuard chỉ áp dụng riêng cho route DELETE, yêu cầu role admin.
+  @UseGuards(RolesGuard)
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.remove(id);
