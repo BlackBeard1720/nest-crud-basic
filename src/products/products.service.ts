@@ -1,94 +1,57 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Like, Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
 import { PatchProductDto } from './dto/patch-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { Product } from './entities/product.entity';
 
 @Injectable()
 export class ProductsService {
-  // Demo lưu data trong mảng; restart server thì dữ liệu tạo mới sẽ mất.
-  private products = [
-    {
-      id: 1,
-      name: 'Laptop',
-      price: 1000,
-    },
-    {
-      id: 2,
-      name: 'Mouse',
-      price: 20,
-    },
-    {
-      id: 3,
-      name: 'PC',
-      price: 5000,
-    },
-    {
-      id: 4,
-      name: 'Phone',
-      price: 400,
-    },
-    {
-      id: 5,
-      name: 'Keyboard',
-      price: 50,
-    },
-  ];
+  constructor(
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
+  ) {}
 
-  // Trả về tất cả products hoặc lọc theo keyword nếu có.
-  findAll(keyword?: string) {
-    if (!keyword) {
-      return this.products;
+  async findAll(keyword?: string) {
+    if (keyword) {
+      return this.productRepository.find({
+        where: {
+          name: Like(`%${keyword}%`),
+        },
+      });
     }
 
-    return this.products.filter((product) =>
-      product.name.toLowerCase().includes(keyword.toLowerCase()),
-    );
+    return this.productRepository.find();
   }
 
-  // Tìm một product theo id.
-  findOne(id: number) {
-    const product = this.products.find((product) => product.id === id);
+  async findOne(id: number) {
+    const product = await this.productRepository.findOneBy({ id });
 
     if (!product) {
       throw new NotFoundException('Product not found');
     }
+
     return product;
   }
 
-  // Tạo product mới từ dữ liệu đã được validate trong DTO.
-  create(createProductDto: CreateProductDto) {
-    const newProduct = {
-      id: this.products.length + 1,
-      name: createProductDto.name,
-      price: createProductDto.price,
-    };
+  async create(createProductDto: CreateProductDto) {
+    const product = this.productRepository.create(createProductDto);
 
-    this.products.push(newProduct);
-
-    return newProduct;
+    return this.productRepository.save(product);
   }
 
-  // Cập nhật toàn bộ name và price của product.
-  update(id: number, updateProductDto: UpdateProductDto) {
-    const product = this.products.find((product) => product.id === id);
-
-    if (!product) {
-      throw new NotFoundException('Product not found');
-    }
+  async update(id: number, updateProductDto: UpdateProductDto) {
+    const product = await this.findOne(id);
 
     product.name = updateProductDto.name;
     product.price = updateProductDto.price;
 
-    return product;
+    return this.productRepository.save(product);
   }
 
-  // Cập nhật từng field nếu client có gửi lên.
-  patch(id: number, patchProductDto: PatchProductDto) {
-    const product = this.products.find((product) => product.id === id);
-
-    if (!product) {
-      throw new NotFoundException('Product not found');
-    }
+  async patch(id: number, patchProductDto: PatchProductDto) {
+    const product = await this.findOne(id);
 
     if (patchProductDto.name !== undefined) {
       product.name = patchProductDto.name;
@@ -98,20 +61,13 @@ export class ProductsService {
       product.price = patchProductDto.price;
     }
 
-    return product;
+    return this.productRepository.save(product);
   }
 
-  // Xóa product khỏi mảng theo id.
-  remove(id: number) {
-    const productIndex = this.products.findIndex(
-      (product) => product.id === id,
-    );
+  async remove(id: number) {
+    const product = await this.findOne(id);
 
-    if (productIndex === -1) {
-      throw new NotFoundException('Product not found');
-    }
-
-    this.products.splice(productIndex, 1);
+    await this.productRepository.remove(product);
 
     return {
       message: 'Product deleted successfully',
